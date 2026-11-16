@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>অঙ্গীকার নামা জেনারেটর</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#eceff4;--panel:#fff;--ink:#16202b;--mute:#667282;--line:#dde3ea;--brand:#1d4f91;--brand2:#e8f0fb;--brand-ink:#fff;--field:#f6f8fa;--ok:#1b7a4b;--desk:#d5dbe3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151b;--panel:#1a222b;--ink:#e8edf2;--mute:#9aa6b3;--line:#2b3641;--brand:#5b94dd;--brand2:#1d2a3a;--brand-ink:#0b1420;--field:#131a21;--ok:#5fc28d;--desk:#0c1015}}
+:root[data-theme="dark"]{--bg:#10151b;--panel:#1a222b;--ink:#e8edf2;--mute:#9aa6b3;--line:#2b3641;--brand:#5b94dd;--brand2:#1d2a3a;--brand-ink:#0b1420;--field:#131a21;--ok:#5fc28d;--desk:#0c1015}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Bengali",system-ui,sans-serif}
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:700;font-size:18px}
+.top h1{margin:0;font-size:17px;font-weight:600}.top p{margin:1px 0 0;font-size:12px;color:var(--mute)}
+.wrap{display:grid;grid-template-columns:390px 1fr;gap:20px;max-width:1280px;margin:0 auto;padding:18px 20px 48px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;margin:0 0 4px}
+.card h2 i{font-style:normal;width:22px;height:22px;border-radius:7px;background:var(--brand2);color:var(--brand);display:grid;place-items:center;font-size:12px}
+label{display:block;font-size:12px;color:var(--mute);margin:11px 0 4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--field);color:var(--ink);font:inherit;font-size:14.5px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:-1px}
+textarea{resize:vertical;min-height:90px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;font-size:13.5px;font-weight:500;border:0;border-radius:9px;padding:10px 14px;cursor:pointer;background:var(--brand);color:var(--brand-ink)}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.55;cursor:wait}
+.sigrow{display:flex;gap:12px;align-items:center;margin-top:10px}
+.sigprev{width:130px;height:62px;border:1px dashed var(--line);border-radius:9px;background:#fff;display:grid;place-items:center;overflow:hidden;font-size:11px;color:#8a94a0}
+.sigprev img{max-width:100%;max-height:100%}
+details summary{cursor:pointer;font-size:13px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+details summary::after{content:"＋";color:var(--mute)}details[open] summary::after{content:"－"}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);padding:6px 0}
+.hint{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:7px}.hint b{display:inline-block;width:18px;height:11px;background:#fff3b0;outline:1px dashed #d4a900}
+.btns{display:flex;gap:8px}
+#msg{font-size:12.5px;min-height:18px;color:var(--mute);margin-bottom:6px}#msg.ok{color:var(--ok)}
+.desk{background:var(--desk);border-radius:14px;padding:14px}
+#box{position:relative;width:100%;box-shadow:0 6px 28px #0003;background:#fff}
+#scaler{transform-origin:0 0;width:794px;height:1123px;position:absolute;left:0;top:0}
+#sheet{width:794px;height:1123px;background:#fff;color:#111;padding:84px 91px;font-family:"Noto Serif Bengali","Noto Sans Bengali",serif;overflow:hidden}
+#sheet h3{text-align:center;font-size:24pt;font-weight:700;margin:0 0 30px}
+#sheet .body{font-size:15pt;line-height:2.05;text-align:justify;margin:0;white-space:pre-wrap}
+.lower{display:flex;justify-content:space-between;align-items:flex-start;margin-top:60px}
+.date{font-size:15pt;white-space:nowrap;margin-top:52px}
+.sig{width:48%;text-align:center;font-size:15pt;line-height:1.9}
+.sigslot{height:70px;margin:2px 0 -6px;display:flex;align-items:flex-end;justify-content:center;outline:1px dashed #d4a900;background:#fff9d6;cursor:pointer}
+.sigslot img{max-height:70px;max-width:100%;object-fit:contain}
+.sigslot span{font:11pt "Noto Sans Bengali",sans-serif;color:#8a6d00}
+.line{border-top:1.2px solid #111;margin-bottom:4px}
+.det{display:inline-block;text-align:left;line-height:1.85}
+.ed{background:#fff3b0;outline:1px dashed #d4a900;outline-offset:1px;cursor:text;border-radius:2px}
+.ed:hover{background:#ffe680}#sheet .ed[data-k="no"],#sheet .ed[data-k="name"],#sheet b{font-weight:700}.pledge{display:block;margin-top:41px}.blk{display:block;margin:0 0 14px}.ed:empty{display:inline-block;min-width:3em}.ed.on{background:#fff;outline:2px solid #1d4f91}
+.ed select,.ed input{width:auto;font-size:13pt;padding:2px 4px;background:#fff;color:#111}
+#sheet.exporting .ed,#sheet.exporting .sigslot{background:none;outline:none}
+#sheet.exporting .sigslot span{display:none}
+#modal{position:fixed;inset:0;background:#0009;display:grid;place-items:center;z-index:20;padding:14px}
+#modal[hidden]{display:none}.fbm{position:fixed;inset:0;background:#0009;display:grid;place-items:center;z-index:30;padding:14px;overflow:auto}
+.mc{background:var(--panel);border-radius:16px;padding:18px;width:min(640px,100%);max-height:92vh;overflow:auto}
+.mc h2{margin:0 0 10px;font-size:16px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{background:var(--field);color:var(--ink);border:1px solid var(--line)}.tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+canvas.cv{width:100%;border:1px solid var(--line);border-radius:10px;touch-action:none;display:block;background:#fff}
+.mrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}.mrow label{margin:0;display:flex;align-items:center;gap:6px;color:var(--ink)}.mrow input{width:auto}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#prev{max-height:70px;max-width:200px;background:#fff;border:1px dashed var(--line)}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;padding:12px 12px 40px}.desk{padding:8px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="logo">অ</div><div><h1>অঙ্গীকার নামা জেনারেটর</h1><p>তথ্য দিন → প্রিভিউ দেখুন → PDF বা ছবি ডাউনলোড</p></div></div>
+
+<div class="wrap">
+<aside>
+  <div class="card"><h2><i>অ</i>লেটারের ধরন</h2><label for="f_tpl">লেখার ভার্সন</label><select id="f_tpl"><option value="1">১. মূল (আপনার ফাইলের লেখা)</option><option value="2">২. সংশোধিত সংক্ষিপ্ত</option><option value="3">৩. অঙ্গীকারসহ (ডিফল্ট)</option><option value="4">৪. আনুষ্ঠানিক আবেদনপত্র</option></select></div>
+  <div class="card">
+    <h2><i>১</i>ব্যক্তিগত তথ্য</h2>
+    <div class="row">
+      <div><label for="f_no">নম্বর</label><input id="f_no" inputmode="numeric"></div>
+      <div><label for="f_rank">পদবী</label><input id="f_rank"></div>
+    </div>
+    <label for="f_name">নাম</label><input id="f_name">
+    <label for="f_place">বর্তমান কর্মস্থল</label><input id="f_place">
+  </div>
+
+  <div class="card">
+    <h2><i>২</i>কোম্পানী ও ছুটি</h2>
+    <div class="row">
+      <div><label for="f_co">কোম্পানী</label><select id="f_co"></select></div>
+      <div><label for="f_year">ছুটির সাল</label><input id="f_year" inputmode="numeric"></div>
+    </div>
+    <div class="row">
+      <div><label for="f_det">ছুটির ডিটেইল</label><select id="f_det"></select></div>
+      <div><label for="f_date">তারিখ</label><input id="f_date" type="date"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><i>৩</i>স্বাক্ষর</h2>
+    <div class="sigrow">
+      <div class="sigprev" id="sigPrev">নেই</div>
+      <div style="display:grid;gap:8px"><button id="bSig">স্বাক্ষর যোগ / পরিবর্তন</button><button class="sec" id="bSigDel">সরান</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>অতিরিক্ত সেটিং</summary>
+      <label for="f_title">শিরোনাম</label><input id="f_title">
+      <label for="f_bn">ব্যাটালিয়ন</label><input id="f_bn">
+      <div class="row">
+        <div><label for="f_pre">কোম্পানী উপসর্গ</label><input id="f_pre"></div>
+        <div><label for="f_type">ছুটির ধরন</label><input id="f_type"></div>
+      </div>
+      <label for="f_msg">মেসেজ কনটেন্ট (ফাঁকা = অটো লেখা)</label>
+      <textarea id="f_msg" placeholder="নিজের লেখা দিলে অটো লেখার বদলে এটি বসবে"></textarea>
+      <div class="mfoot" style="justify-content:flex-start"><button class="sec" id="bLoad">অটো লেখা এডিটের জন্য লোড</button><button class="sec" id="bReset">মূল তথ্য ফিরিয়ে আনুন</button></div>
+    </details>
+  </div>
+</aside>
+
+<main>
+  <div class="bar">
+    <div class="hint"><b></b>হলুদ অংশে ডাবল-ক্লিক করে সরাসরি এডিট করুন</div>
+    <div class="btns"><button id="bPdf">PDF ডাউনলোড</button><button class="sec" id="bImg">ছবি (PNG)</button></div>
+  </div>
+  <div id="msg" role="status"></div>
+  <div class="desk"><div id="box"><div id="scaler"><div id="sheet">
+    <h3 id="p_title"></h3>
+    <p class="body" id="p_body"></p>
+    <div class="lower">
+      <div class="date" id="p_date"></div>
+      <div class="sig">
+        <div>বিনীত নিবেদক</div>
+        <div>আপনার একান্ত বাধ্যগত সৈনিক</div>
+        <div class="sigslot" id="sigslot"></div>
+        <div class="line"></div>
+        <div class="det" id="p_det"></div>
+      </div>
+    </div>
+  </div></div></div></div>
+</main>
+</div>
+
+<div id="modal" hidden><div class="mc">
+  <h2>স্বাক্ষর যোগ করুন</h2>
+  <div class="tabs"><button data-t="draw" class="on">স্ক্রিনে সাইন</button><button data-t="up">ছবি আপলোড</button></div>
+  <div id="tDraw">
+    <canvas id="pad" class="cv" width="720" height="260"></canvas>
+    <div class="mrow"><button class="sec" id="padClr">মুছুন</button><span style="color:var(--mute)">আঙুল বা মাউস দিয়ে সাইন করুন</span></div>
+  </div>
+  <div id="tUp" hidden>
+    <input type="file" id="file" accept="image/*">
+    <canvas id="crop" class="cv" style="margin-top:10px" hidden></canvas>
+    <div class="mrow" id="upCtl" hidden>
+      <label><input type="checkbox" id="bw" checked> সাদাকালো</label>
+      <label>গাঢ়তা <input type="range" id="th" min="60" max="230" value="160"></label>
+      <span style="color:var(--mute)">ছবির ওপর টেনে ক্রপ করুন</span>
+    </div>
+    <div class="mrow" id="upPrev" hidden>ফলাফল: <canvas id="prev"></canvas></div>
+  </div>
+  <div class="mfoot"><button class="sec" id="mCancel">বাতিল</button><button id="mUse">ব্যবহার করুন</button></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const DOTS='................';
+const bn=s=>String(s).replace(/[0-9]/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const CO=['এ','বি','সি','ডি','ই'],DET=['','১ম','২য়','৩য়','৪র্থ','৫ম'];
+const DEF={title:'অধিকার নামা',no:'১১০৪১৯',rank:'সিপাহী',name:'শাহরিয়ার জামান শিপলু',pre:'৩৫/',co:'ডি',place:'দাঁতভাঙ্গা বিওপিতে',bn:'জামালপুর ব্যাটালিয়ন (৩৫ বিজিবি)',year:'২০২৭',type:'অর্জিত ছুটি',det:'',date:'',msg:'',tpl:'3'};
+let S={...DEF,sig:''},editing=false;
+try{let s=JSON.parse(localStorage.getItem('adhikar_v3')||'null');if(!s){s=JSON.parse(localStorage.getItem('adhikar_v2')||'null');if(s)delete s.tpl;}if(s)S={...S,...s};}catch(e){}
+const KEYS=Object.keys(DEF);
+
+function fillSel(s,k){s.innerHTML='';(k==='co'?CO:DET).forEach((v,i)=>{const o=document.createElement('option');o.value=v;o.textContent=k==='co'?v+' কোম্পানী ('+'ABCDE'[i]+')':(v?v+' ডিটেইল':'ফাঁকা (ডট)');s.appendChild(o);});}
+fillSel($('f_co'),'co');fillSel($('f_det'),'det');
+function sync(){KEYS.forEach(k=>$('f_'+k).value=S[k]);}
+KEYS.forEach(k=>{const e=$('f_'+k);e.addEventListener('input',()=>{S[k]=e.value;render();});e.addEventListener('change',()=>{S[k]=e.value;render();});});
+
+function disp(k){
+  if(k==='co')return bn(S.pre+S.co+' কোম্পানী');
+  if(k==='det')return S.det||DOTS;
+  if(k==='date'){if(!S.date)return DOTS;const [y,m,d]=S.date.split('-');return bn(d+'/'+m+'/'+y);}
+  return bn(S[k]||'')||DOTS;
+}
+const T=s=>document.createTextNode(s);
+function mk(k){const e=document.createElement('span');e.className='ed';e.dataset.k=k;e.textContent=disp(k);return e;}
+function put(el,parts){el.replaceChildren(...parts.map(p=>typeof p==='string'?T(p):p));}
+
+function render(){
+  if(editing)return;
+  put($('p_title'),[mk('title')]);
+  if(S.msg.trim())$('p_body').textContent=bn(S.msg);
+  else put($('p_body'),tplParts());
+  put($('p_date'),['তারিখ : ',mk('date'),' ইং']);
+  const d=$('p_det');d.replaceChildren();
+  [['নম্বর-',mk('no'),' পদবী ',mk('rank')],['নামঃ ',mk('name')],[mk('bn')]].forEach(l=>{const x=document.createElement('div');put(x,l);d.appendChild(x);});
+  const sl=$('sigslot');sl.replaceChildren();
+  if(S.sig){const i=new Image();i.src=S.sig;sl.appendChild(i);}else{const p=document.createElement('span');p.textContent='✍ স্বাক্ষর যোগ করতে ডাবল-ক্লিক';sl.appendChild(p);}
+  const sp=$('sigPrev');sp.replaceChildren();
+  if(S.sig){const i=new Image();i.src=S.sig;sp.appendChild(i);}else sp.textContent='নেই';
+  try{localStorage.setItem('adhikar_v3',JSON.stringify(S));}catch(e){}
+}
+const B=t=>T(t);
+const Bd=(...p)=>{const e=document.createElement('b');put(e,p);return e;};
+const blk=c=>(...p)=>{const e=document.createElement('span');e.className=c;put(e,p);return e;};
+const H=blk('subj'),P=blk('pledge'),A=blk('blk');
+function tpl3(id,ask){return [...id,...ask,'বিষয়টি আপনার সদয় অবগতির জন্য নিবেদন করা হলো।',P('আমি অঙ্গীকার করছি যে, ছুটিকালীন সময়ে বাহিনীর ',B('শৃঙ্খলা ও নিয়মকানুন যথাযথভাবে মেনে চলব'),' এবং ছুটি শেষে ',B('নির্ধারিত তারিখে যথাসময়ে কর্মস্থলে যোগদান করব'),'।')];}
+function tpl4(id,ask){return [A(B('বরাবর,'),'\n','অধিনায়ক','\n',mk('bn')),A('জনাব,'),'যথাবিহিত সম্মানপূর্বক বিনীত নিবেদন এই যে, ',...id,...ask,'বিষয়টি মহোদয়ের সদয় অবগতির জন্য নিবেদন করা হলো।'];}
+function tplParts(){
+  const id=['আমি নম্বর- ',Bd(mk('no'),' ',mk('rank'),' ',mk('name'),', ',mk('co'),','),' বর্তমানে ',mk('place'),' কর্মরত আছি। '];
+  const ask=['আমি আগামী ',mk('year'),' সালের প্রাপ্য ',Bd(mk('type'),' ',mk('det'),' ডিটেইলে'),' ভোগ করার ইচ্ছা প্রকাশ করছি। '];
+  if(S.tpl==='3')return tpl3(id,ask);
+  if(S.tpl==='4')return tpl4(id,ask);
+  if(S.tpl==='2')return [...id,...ask,'বিষয়টি আপনার সদয় অবগতির জন্য নিবেদন করা হলো।'];
+  if(S.tpl==='3')return [...id,...ask,'অতএব, ছুটি মঞ্জুর করার জন্য সবিনয়ে অনুরোধ করছি।\n\nআমি ��ঙ্গীকার করছি যে, ছুটিকালীন সময়ে বাহিনীর শৃঙ্খলা ও নিয়মকানুন যথাযথভাবে মেনে চলব এবং ছুটি শেষে নির্ধারিত তারিখে যথাসময়ে কর্মস্থলে যোগদান করব।'];
+  if(S.tpl==='4')return ['বরাবর,\nঅধিনায়ক\n',mk('bn'),'\n\nবিষয়: ',mk('year'),' সালের ',mk('type'),' ভোগের অনুমতি প্রসঙ্গে।\n\nজনাব,\nযথাবিহিত সম্মানপূর্বক বিনীত নিবেদন এই যে, ',...id,...ask,'অতএব, ছুটি মঞ্জুর করার জন্য মহোদয়ের সদয় অনুমতি প্রার্থনা করছি।'];
+  return ['আমি নম্বর- ',mk('no'),' ',mk('rank'),' ',mk('name'),' ',mk('co'),' বর্তমানে ',mk('place'),' কর্মরত আছি। স্যার আমি ',mk('year'),' সালে ',mk('type'),' ',mk('det'),' ডিটেইলে ',mk('type'),' ভোগ করতে ইচ্ছুক।'];
+}
+function fit(){const s=$('box').clientWidth/794;$('scaler').style.transform='scale('+s+')';$('box').style.height=(1123*s)+'px';}
+
+/* ক্যানভাসে ডাবল-ক্লিক এডিট */
+function done(){if(!editing)return;editing=false;sync();render();}
+function edit(el){
+  if(editing)return;const k=el.dataset.k;editing=true;
+  if(k==='co'||k==='det'){const s=document.createElement('select');fillSel(s,k);s.value=S[k];el.replaceChildren(s);s.focus();s.onchange=()=>{S[k]=s.value;done();};s.onblur=done;return;}
+  if(k==='date'){const i=document.createElement('input');i.type='date';i.value=S.date;el.replaceChildren(i);i.focus();i.onchange=()=>{S.date=i.value;};i.onblur=done;return;}
+  el.classList.add('on');el.textContent=S[k];
+  el.contentEditable='true';try{el.contentEditable='plaintext-only';}catch(e){}
+  el.focus();const r=document.createRange();r.selectNodeContents(el);const g=getSelection();g.removeAllRanges();g.addRange(r);
+  el.onblur=()=>{S[k]=el.textContent.replace(/\s+/g,' ').trim();done();};
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}if(e.key==='Escape'){el.onblur=null;done();}};
+}
+$('sheet').addEventListener('dblclick',e=>{
+  if(e.target.closest('select,input'))return;
+  const el=e.target.closest('.ed');if(el)return edit(el);
+  if(e.target.closest('#sigslot'))openModal();
+});
+
+/* স্বাক্ষর মডাল */
+let tab='draw',img=null,sel=null,ds=1;
+const pad=$('pad'),pc=pad.getContext('2d'),cr=$('crop'),cc=cr.getContext('2d');
+function openModal(){$('modal').hidden=false;pc.clearRect(0,0,pad.width,pad.height);setTab('draw');}
+function setTab(t){tab=t;$('tDraw').hidden=t!=='draw';$('tUp').hidden=t!=='up';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+$('bSig').onclick=openModal;$('mCancel').onclick=()=>{$('modal').hidden=true;};
+$('bSigDel').onclick=()=>{S.sig='';render();};
+let drawing=false,last=null;
+const pp=e=>{const r=pad.getBoundingClientRect();return {x:(e.clientX-r.left)*pad.width/r.width,y:(e.clientY-r.top)*pad.height/r.height};};
+pad.onpointerdown=e=>{drawing=true;last=pp(e);pad.setPointerCapture(e.pointerId);pc.fillStyle='#000';pc.beginPath();pc.arc(last.x,last.y,2,0,7);pc.fill();};
+pad.onpointermove=e=>{if(!drawing)return;const p=pp(e);pc.strokeStyle='#000';pc.lineWidth=4;pc.lineCap=pc.lineJoin='round';pc.beginPath();pc.moveTo(last.x,last.y);pc.lineTo(p.x,p.y);pc.stroke();last=p;};
+pad.onpointerup=pad.onpointercancel=()=>{drawing=false;};
+$('padClr').onclick=()=>pc.clearRect(0,0,pad.width,pad.height);
+
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{img=im;const w=Math.min(600,im.width);ds=w/im.width;cr.width=w;cr.height=Math.round(im.height*ds);sel={x:0,y:0,w:cr.width,h:cr.height};cr.hidden=false;$('upCtl').hidden=false;$('upPrev').hidden=false;drawCrop();};im.src=URL.createObjectURL(f);};
+function drawCrop(){
+  cc.clearRect(0,0,cr.width,cr.height);cc.drawImage(img,0,0,cr.width,cr.height);
+  cc.fillStyle='rgba(0,0,0,.5)';cc.fillRect(0,0,cr.width,cr.height);
+  cc.save();cc.beginPath();cc.rect(sel.x,sel.y,sel.w,sel.h);cc.clip();cc.drawImage(img,0,0,cr.width,cr.height);cc.restore();
+  cc.strokeStyle='#ffd400';cc.lineWidth=2;cc.strokeRect(sel.x,sel.y,sel.w,sel.h);
+  const p=process();const pv=$('prev');if(p){pv.width=p.width;pv.height=p.height;pv.getContext('2d').drawImage(p,0,0);}
+}
+const cp=e=>{const r=cr.getBoundingClientRect();return {x:Math.max(0,Math.min(cr.width,(e.clientX-r.left)*cr.width/r.width)),y:Math.max(0,Math.min(cr.height,(e.clientY-r.top)*cr.height/r.height))};};
+let st=null;
+cr.onpointerdown=e=>{st=cp(e);cr.setPointerCapture(e.pointerId);};
+cr.onpointermove=e=>{if(!st)return;const p=cp(e);sel={x:Math.min(st.x,p.x),y:Math.min(st.y,p.y),w:Math.abs(st.x-p.x),h:Math.abs(st.y-p.y)};drawCrop();};
+cr.onpointerup=cr.onpointercancel=()=>{st=null;if(sel.w<8||sel.h<8){sel={x:0,y:0,w:cr.width,h:cr.height};drawCrop();}};
+$('bw').onchange=$('th').oninput=()=>{if(img)drawCrop();};
+function trim(c){
+  const x=c.getContext('2d'),d=x.getImageData(0,0,c.width,c.height).data;let x0=c.width,y0=c.height,x1=-1,y1=-1;
+  for(let y=0;y<c.height;y++)for(let i=0;i<c.width;i++)if(d[(y*c.width+i)*4+3]>20){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y;}
+  if(x1<0)return null;const p=6,w=x1-x0+1+p*2,h=y1-y0+1+p*2,o=document.createElement('canvas');o.width=w;o.height=h;
+  o.getContext('2d').drawImage(c,x0-p,y0-p,w,h,0,0,w,h);return o;
+}
+function process(){
+  if(!img||!sel)return null;
+  const sx=sel.x/ds,sy=sel.y/ds,sw=sel.w/ds,sh=sel.h/ds,k=Math.min(1,900/sw),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(sw*k));c.height=Math.max(1,Math.round(sh*k));
+  const x=c.getContext('2d');x.drawImage(img,sx,sy,sw,sh,0,0,c.width,c.height);
+  if(!$('bw').checked)return c;
+  const id=x.getImageData(0,0,c.width,c.height),d=id.data,th=+$('th').value;
+  for(let i=0;i<d.length;i+=4){const l=.299*d[i]+.587*d[i+1]+.114*d[i+2];if(l<th&&d[i+3]>20){d[i]=d[i+1]=d[i+2]=0;d[i+3]=255;}else d[i+3]=0;}
+  x.putImageData(id,0,0);return trim(c);
+}
+$('mUse').onclick=()=>{
+  const out=tab==='draw'?trim(pad):process();
+  if(!out){say('স্বাক্ষর পাওয়া যায়নি — সাইন করুন বা ছবি দিন।');return;}
+  S.sig=out.toDataURL('image/png');$('modal').hidden=true;render();say('স্বাক্ষর যোগ হয়েছে।',true);
+};
+
+/* বাটন */
+$('bLoad').onclick=()=>{const t=document.createElement('div');put(t,[]);S.msg=$('p_body').textContent.replace(/\s+/g,' ').trim();sync();render();};
+$('bReset').onclick=()=>{const g=S.sig;S={...DEF,sig:g};sync();render();say('মূল তথ্য ফিরিয়ে আনা হয়েছে।');};
+
+/* ডাউনলোড */
+let downloads=null;
+async function getDl(){try{return window.claude&&claude.use?await claude.use('downloads'):null;}catch(e){return null;}}
+getDl().then(d=>{downloads=d;});
+function say(t,ok){const m=$('msg');m.textContent=t;m.className=ok?'ok':'';}
+async function capture(){
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  return html2canvas($('sheet'),{scale:3,backgroundColor:'#ffffff',useCORS:true,onclone:d=>{d.getElementById('sheet').classList.add('exporting');d.getElementById('scaler').style.transform='none';}});
+}
+const base=()=>'odhikar-nama-'+(bn(S.no)||'doc');
+async function deliver(name,blob,c){
+  const d=downloads||await getDl();
+  if(d){try{await d.save({filename:name,data:blob});return;}catch(e){if(e&&e.code==='declined')throw e;}}
+  try{const file=new File([blob],name,{type:name.endsWith('.pdf')?'application/pdf':'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return;}
+  }catch(e){if(e&&e.name==='AbortError')throw {code:'declined'};}
+  showFallback(c);throw {code:'fallback'};
+}
+function showFallback(c){
+  let m=$('fb');if(!m){m=document.createElement('div');m.id='fb';m.className='fbm';document.body.appendChild(m);}
+  m.replaceChildren();
+  const card=document.createElement('div');card.className='mc';
+  const h=document.createElement('h2');h.textContent='ছবিটি সংরক্ষণ করুন';
+  const p=document.createElement('p');p.style.cssText='font-size:13px;color:var(--mute);margin:0 0 10px';
+  p.textContent='এই ভিউতে সরাসরি ডাউনলোড চালু নেই। নিচের ছবিটি চেপে ধরে (বা ডান-ক্লিক করে) সংরক্ষণ করুন। PDF দরকার হলে লিংকটি ব্রাউজারে (claude.ai) খুলে আবার চেষ্টা করুন।';
+  const im=new Image();im.src=c.toDataURL('image/png');im.style.cssText='width:100%;border:1px solid var(--line);border-radius:8px;background:#fff';
+  const f=document.createElement('div');f.className='mfoot';const b=document.createElement('button');b.textContent='বন্ধ করুন';b.onclick=()=>m.remove();f.appendChild(b);
+  card.append(h,p,im,f);m.appendChild(card);
+}
+async function run(btn,fn){
+  
+  if(editing)document.activeElement.blur();
+  btn.disabled=true;say('তৈরি হচ্ছে…');
+  try{await fn();say('ফাইল সংরক্ষণ হয়েছে।',true);}catch(e){say(e&&e.code==='fallback'?'এই ভিউতে সরাসরি ডাউনলোড চালু নেই — নিচের ছবিটি চেপে ধরে সংরক্ষণ করুন।':e&&e.code==='declined'?'ডাউনলোড বাতিল করা হয়েছে।':'ডাউনলোড করা যায়নি, আবার চেষ্টা করুন।');}
+  btn.disabled=false;
+}
+$('bImg').onclick=()=>run($('bImg'),async()=>{const c=await capture();const b=await new Promise(r=>c.toBlob(r,'image/png'));await deliver(base()+'.png',b,c);});
+$('bPdf').onclick=()=>run($('bPdf'),async()=>{const c=await capture();const {jsPDF}=window.jspdf;const p=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});p.addImage(c.toDataURL('image/jpeg',.96),'JPEG',0,0,210,297);await deliver(base()+'.pdf',p.output('blob'),c);});
+
+window.addEventListener('resize',fit);
+sync();render();fit();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+</script>
+</body>
+</html>
